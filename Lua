@@ -6,7 +6,7 @@ UI:CreateKeySystem({
     Title = "Incremental Hub",
     Subtitle = "Enter your key to continue",
     GetKeyLink = "https://example.com/get-key",
-    Theme = "Midnight",
+    Theme = "Matrix",
     OnSuccess = function()
         local Window = UI:CreateWindow({
             Name = "Incremental Hub",
