@@ -1,0 +1,93 @@
+-- IncrementalUi v5.1 demo
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/diegoawan/Uiv5/refs/heads/main/Lua"))()
+
+UI:CreateKeySystem({
+    Key = { "Test", "Demo" },
+    Title = "Incremental Hub",
+    Subtitle = "Enter your key to continue",
+    GetKeyLink = "https://example.com/get-key",
+    Theme = "Midnight",
+    OnSuccess = function()
+        local Window = UI:CreateWindow({
+            Name = "Incremental Hub",
+            Subtitle = "v1.0",
+            Theme = "Matrix",       -- try: Frost, Sakura, Inferno, Ocean, Matrix, Aurora, Cyberpunk, Forest, Storm
+            Keybind = Enum.KeyCode.RightControl,
+        })
+
+        ---------------------------------------------------------- Main
+        local Main = Window:CreateTab("Main")
+
+        local Combat = Main:CreateSection("Combat")
+        Combat:CreateToggle({
+            Name = "Auto Farm", ConfigKey = "autofarm", CurrentValue = false,
+            Callback = function(v) print("Auto Farm:", v) end,
+        })
+        Combat:CreateSlider({
+            Name = "Walk Speed", ConfigKey = "speed", Range = { 16, 100 }, CurrentValue = 16, Suffix = " studs",
+            Callback = function(v)
+                local hum = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if hum then hum.WalkSpeed = v end
+            end,
+        })
+        Combat:CreateDropdown({
+            Name = "Target", ConfigKey = "target", Options = { "Nearest", "Lowest Health", "Highest Health" }, CurrentOption = "Nearest",
+            Callback = function(v) print("Target:", v) end,
+        })
+        Combat:CreateKeybind({
+            Name = "Quick Action", ConfigKey = "quickkey", CurrentKey = Enum.KeyCode.F,
+            Callback = function() Window:Notify({ Title = "Quick Action", Content = "Keybind pressed!", Type = "Info" }) end,
+        })
+
+        local Misc = Main:CreateSection("Misc")
+        Misc:CreateTextbox({
+            Name = "Webhook Name", ConfigKey = "hookname", PlaceholderText = "Type here...",
+            Callback = function(text, enter) print("Text:", text, "Enter:", enter) end,
+        })
+        Misc:CreateButton({
+            Name = "Success Notification",
+            Callback = function() Window:Notify({ Title = "Done", Content = "Everything worked.", Type = "Success" }) end,
+        })
+        Misc:CreateButton({
+            Name = "Warning Notification",
+            Callback = function() Window:Notify({ Title = "Careful", Content = "This is a warning with a longer message to show text wrapping.", Type = "Warning" }) end,
+        })
+        Misc:CreateButton({
+            Name = "Error Notification",
+            Callback = function() Window:Notify({ Title = "Failed", Content = "Something went wrong.", Type = "Error" }) end,
+        })
+        Misc:CreateDivider()
+        Misc:CreateLabel("Press RightControl to hide or show the window.")
+        Misc:CreateParagraph({ Title = "About", Content = "Click anywhere for sparks, hover rows for the edge glow, and use the search box to filter controls." })
+
+        ---------------------------------------------------------- Config
+        local Config = Window:CreateTab("Config")
+        local Cfg = Config:CreateSection("Configs")
+        local nameBox = Cfg:CreateTextbox({ Name = "Config Name", CurrentValue = "default" })
+        Cfg:CreateButton({
+            Name = "Save Config",
+            Callback = function()
+                local n = nameBox.GetValue()
+                Window:SaveConfig(n)
+                Window:SaveToFile(n)
+                Window:Notify({ Title = "Saved", Content = "Config '" .. n .. "' saved.", Type = "Success" })
+            end,
+        })
+        Cfg:CreateButton({
+            Name = "Load Config",
+            Callback = function()
+                local n = nameBox.GetValue()
+                if Window:LoadConfig(n) or Window:LoadFromFile(n) then
+                    Window:Notify({ Title = "Loaded", Content = "Config '" .. n .. "' loaded.", Type = "Success" })
+                else
+                    Window:Notify({ Title = "Not found", Content = "No config named '" .. n .. "'.", Type = "Error" })
+                end
+            end,
+        })
+
+        ---------------------------------------------------------- Settings (theme + background pickers)
+        Window:CreateSettingsTab("Settings")
+
+        Window:Notify({ Title = "Welcome", Content = "Pick a theme in the Settings tab.", Type = "Info", Duration = 5 })
+    end,
+})
